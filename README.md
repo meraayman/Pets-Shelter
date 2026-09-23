@@ -1,7 +1,4 @@
-# Pet Adoption System (Python version)
-
-The same system as before, rebuilt in Python with Flask. The database is a single file
-(`instance/petadoption.db`), so there's no XAMPP, Apache or MySQL to install.
+# Pet Adoption System 
 
 ## Start it
 
