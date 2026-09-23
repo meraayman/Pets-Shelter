@@ -141,29 +141,6 @@ Click **Sign in → Shelter staff** at the top of the site and use:
 
 ---
 
-To stop the app, close its window or press `Ctrl + C`.
-
-<details>
-<summary><b>Prefer to run it manually?</b></summary>
-
-```bash
-python -m pip install -r requirements.txt
-python app.py
-```
-</details>
-
-<details>
-<summary><b>More commands</b></summary>
-
-| Command | What it does |
-|---|---|
-| `python app.py` | Start the website |
-| `python app.py --lan` | Also let other computers on your network open it |
-| `python app.py --no-browser` | Start without opening the browser |
-| `python app.py reset-password admin` | Set a new password for a staff account |
-
-</details>
-
 ---
 
 ## Who can do what
