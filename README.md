@@ -191,7 +191,7 @@ Staff can also record adoptions directly for walk-in adopters, without a request
 ## Project structure
 
 ```
-pet_adoption_python_v2/
+Pets-Shelter/
 ├── app.py                 # Start the app and run commands
 ├── schema.sql             # Database structure
 ├── requirements.txt       # Python packages
