@@ -20,7 +20,17 @@
 </p>
 
 </div>
+---
 
+<div align="center">
+
+##  See it in action
+
+<a href="https://drive.google.com/file/d/1QpIymtMILmihpnonM_f3HdF8c_Hk8LBs/view?usp=sharing">
+  <img src="https://img.shields.io/badge/▶%20Watch%20the%20demo-2E6B5A?style=for-the-badge" alt="Watch the demo video">
+</a>
+
+</div>
 ---
 
 ## Why it stands out
