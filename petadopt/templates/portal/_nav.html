@@ -1,0 +1,4 @@
+<nav class="pa-segment mb-4" aria-label="Account">
+  <a href="{{ url_for('portal.home') }}" {% if request.endpoint == 'portal.home' %}aria-current="page"{% endif %}>{{ 'My requests' if current_member.kind == 'adopter' else 'My pets' }}</a>
+  <a href="{{ url_for('portal.profile') }}" {% if request.endpoint == 'portal.profile' %}aria-current="page"{% endif %}>My details</a>
+</nav>

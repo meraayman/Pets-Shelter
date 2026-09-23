@@ -1,0 +1,37 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img, delete_button with context %}
+{% block title %}{{ cfg.title }}{% endblock %}
+{% block subheading %}<p class="pa-greeting">{{ cfg.intro }}</p>{% endblock %}
+{% block actions %}<a href="{{ url_for('records.person_form', kind=kind) }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Add {{ cfg.one }}</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    {% if not people %}<p class="pa-empty mb-0">No {{ cfg.title|lower }} yet. <a href="{{ url_for('records.person_form', kind=kind) }}">Add the first one</a>.</p>{% else %}
+    <table class="table table-hover pa-datatable" data-order='[[1,"asc"]]'>
+      <thead><tr>
+        <th data-orderable="false">Photo</th><th data-priority="1">Name</th><th>Contact</th><th>Email</th><th>Address</th><th>Username</th>
+        {% if kind == 'owners' %}<th>Pets</th>{% endif %}
+        <th data-orderable="false" data-priority="1">Actions</th>
+      </tr></thead>
+      <tbody>
+      {% for p in people %}
+        <tr>
+          <td>{{ upload_img(cfg.folder, p.profile, 'pa-avatar', '') }}</td>
+          <td><strong>{{ p.name }}</strong></td>
+          <td>{{ p.contact or '—' }}</td>
+          <td>{% if p.email %}<a href="mailto:{{ p.email }}">{{ p.email }}</a>{% else %}—{% endif %}</td>
+          <td>{{ p.address or '—' }}</td>
+          <td>{{ p.username }}</td>
+          {% if kind == 'owners' %}<td>{{ p.pet_count }}</td>{% endif %}
+          <td class="text-nowrap">
+            <a href="{{ url_for('records.person_form', kind=kind, pid=p.id) }}" class="btn btn-success btn-sm"><i class="fas fa-pen"></i> Edit</a>
+            {{ delete_button(url_for('records.person_delete', kind=kind, pid=p.id), p.name) }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import pill, upload_img, delete_button, filter_nav with context %}
+{% block title %}Pets{% endblock %}
+{% block actions %}<a href="{{ url_for('records.pet_new') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Add a pet</a>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">{{ filter_nav('records.pets', status, counts) }}</div>
+  <div class="card-body">
+    {% if not pets %}
+      <p class="pa-empty mb-0">{% if status %}No pets are marked {{ status|lower }}.{% else %}No pets yet. <a href="{{ url_for('records.pet_new') }}">Add the first one</a>.{% endif %}</p>
+    {% else %}
+    <table class="table table-hover pa-datatable" data-order='[]'>
+      <thead><tr>
+        <th data-orderable="false" data-priority="3">Photo</th><th data-priority="1">Name</th><th>Type</th><th>Age</th><th>Sex</th>
+        <th>Health</th><th>Vaccines</th><th data-priority="2">Status</th><th>Brought in by</th><th>Registered</th><th data-orderable="false" data-priority="1">Actions</th>
+      </tr></thead>
+      <tbody>
+      {% for p in pets %}
+        <tr>
+          <td>{{ upload_img('pets', p.pet_profile_image, 'img-thumbnail', '') }}</td>
+          <td><strong>{{ p.pet_name }}</strong></td>
+          <td>{{ p.pet_type_name or '—' }}</td>
+          <td data-order="{{ p.age }}">{{ p.age|age }}</td>
+          <td>{{ p.gender or '—' }}</td>
+          <td>{{ pill(p.health_status) }}</td>
+          <td>{{ pill(p.vaccination_status) }}</td>
+          <td>{{ pill(p.adoption_status) }}</td>
+          <td>{{ p.pet_owner_name or '—' }}</td>
+          <td data-order="{{ p.date_registered }}">{{ p.date_registered|date }}</td>
+          <td class="text-nowrap">
+            <a href="{{ url_for('records.pet_edit', pet_id=p.pet_id) }}" class="btn btn-success btn-sm"><i class="fas fa-pen"></i> Edit</a>
+            {{ delete_button(url_for('records.pet_delete', pet_id=p.pet_id), p.pet_name) }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

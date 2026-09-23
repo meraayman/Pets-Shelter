@@ -1,0 +1,67 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}{{ ('Add ' ~ cfg.one) if is_new else ('Edit ' ~ person.name) }}{% endblock %}
+{% block subheading %}<p class="pa-greeting"><a href="{{ url_for('records.people', kind=kind) }}"><i class="fas fa-arrow-left mr-1"></i> Back to {{ cfg.title|lower }}</a></p>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {{ csrf_field() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Details</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="name">Full name</label>
+            <input class="form-control" id="name" name="name" maxlength="100" required value="{{ person.name or '' }}">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="contact">Phone</label>
+              <input class="form-control" id="contact" name="contact" maxlength="30" value="{{ person.contact or '' }}">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="email">Email</label>
+              <input class="form-control" type="email" id="email" name="email" maxlength="100" value="{{ person.email or '' }}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input class="form-control" id="address" name="address" maxlength="255" value="{{ person.address or '' }}">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Sign-in details</h3></div>
+        <div class="card-body">
+          <p class="text-muted small">Saved for the {{ cfg.one }} portal planned for a later version.</p>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="username">Username</label>
+              <input class="form-control" id="username" name="username" maxlength="50" required autocomplete="off" value="{{ person.username or '' }}">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="password">{{ 'Password' if is_new else 'New password' }}</label>
+              <input class="form-control" type="password" id="password" name="password" minlength="8" autocomplete="new-password" {% if is_new %}required{% endif %}>
+              <small class="form-text text-muted">{{ 'At least 8 characters.' if is_new else 'Leave empty to keep the current password.' }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Photo</h3></div>
+        <div class="card-body">
+          <div class="pa-photo-preview pa-photo-preview--round mb-3">{{ upload_img(cfg.folder, person.profile, '', '') }}</div>
+          <input type="file" class="form-control-file" name="profile" accept="image/jpeg,image/png,image/gif,image/webp" data-preview=".pa-photo-preview img">
+          <small class="form-text text-muted">Optional. JPG, PNG, GIF or WebP.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pa-form-actions">
+    <button type="submit" class="btn btn-primary">{{ 'Add ' ~ cfg.one if is_new else 'Save changes' }}</button>
+    <a href="{{ url_for('records.people', kind=kind) }}" class="btn btn-default">Cancel</a>
+  </div>
+</form>
+{% endblock %}

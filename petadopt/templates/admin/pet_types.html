@@ -1,0 +1,50 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import delete_button with context %}
+{% block title %}Pet types{% endblock %}
+{% block subheading %}<p class="pa-greeting">The kinds of animals the shelter takes in. Visitors can filter pets by these.</p>{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Add a type</h3></div>
+      <div class="card-body">
+        <form method="post">
+          {{ csrf_field() }}
+          <div class="form-group">
+            <label for="pet_type_name">Name</label>
+            <input class="form-control" id="pet_type_name" name="pet_type_name" maxlength="100" placeholder="For example, Dog" required>
+          </div>
+          <button class="btn btn-primary">Add type</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        {% if not types %}<p class="pa-empty mb-0">No pet types yet. Add one to start registering pets.</p>{% else %}
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Name</th><th>Pets</th><th class="text-right">Actions</th></tr></thead>
+          <tbody>
+          {% for t in types %}
+            <tr>
+              <td>
+                <form method="post" action="{{ url_for('records.pet_type_edit', type_id=t.pet_type_id) }}" class="pa-inline-edit">
+                  {{ csrf_field() }}
+                  <label class="sr-only" for="type-{{ t.pet_type_id }}">Name</label>
+                  <input class="form-control form-control-sm" id="type-{{ t.pet_type_id }}" name="pet_type_name" value="{{ t.pet_type_name }}" maxlength="100" required>
+                  <button class="btn btn-default btn-sm">Rename</button>
+                </form>
+              </td>
+              <td><a href="{{ url_for('records.pets') }}">{{ t.pet_count }}</a></td>
+              <td class="text-right">{{ delete_button(url_for('records.pet_type_delete', type_id=t.pet_type_id), '“' ~ t.pet_type_name ~ '”') }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

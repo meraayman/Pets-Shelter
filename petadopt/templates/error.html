@@ -1,0 +1,16 @@
+{% extends "base_public.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<main class="pa-section">
+  <div class="container">
+    <div class="pa-empty-state">
+      <i class="fas fa-paw"></i>
+      <h3>{{ title }}</h3>
+      <p>{{ message }}</p>
+      <p class="mt-4 mb-0">
+        <a class="btn pa-btn-primary" href="{{ url_for('admin.dashboard') if current_user else url_for('public.home') }}">{{ 'Go to the dashboard' if current_user else 'Go to the homepage' }}</a>
+      </p>
+    </div>
+  </div>
+</main>
+{% endblock %}

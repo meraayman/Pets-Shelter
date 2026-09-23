@@ -1,0 +1,21 @@
+{% extends "base_admin.html" %}
+{% block title %}Reports{% endblock %}
+{% block subheading %}<p class="pa-greeting">Open a report to view or print it, or download it as a spreadsheet.</p>{% endblock %}
+{% block content %}
+<div class="row">
+  {% for key, rep in reports.items() %}
+  <div class="col-md-6 mb-3">
+    <div class="card h-100 mb-0">
+      <div class="card-body d-flex flex-column">
+        <h3 class="card-title mb-2">{{ rep.title }}</h3>
+        <p class="text-muted flex-grow-1">{{ rep.description }}</p>
+        <div>
+          <a href="{{ url_for('admin.report', key=key) }}" class="btn btn-primary btn-sm">Open report</a>
+          <a href="{{ url_for('admin.report_csv', key=key) }}" class="btn btn-default btn-sm"><i class="fas fa-file-csv mr-1"></i> Download CSV</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

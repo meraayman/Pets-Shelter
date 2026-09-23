@@ -1,0 +1,92 @@
+{% extends "base_public.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}My account{% endblock %}
+{% block content %}
+<main class="pa-section">
+  <div class="container">
+    <h1 class="pa-page-title">Hello, {{ current_member.name.split(' ')[0] }}</h1>
+    {% include "portal/_nav.html" %}
+    {% include "_flashes.html" %}
+
+    {% if current_member.kind == 'adopter' %}
+      {% if adopted %}
+      <h2 class="pa-subhead">Pets you've adopted</h2>
+      <div class="pa-mini-grid mb-5">
+        {% for a in adopted %}
+        <div class="pa-mini">
+          {{ upload_img('pets', a.pet_profile_image) }}
+          <div><strong>{{ a.pet_name }}</strong><span>{{ a.pet_type_name or '' }}, home since {{ a.adoption_date|date }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <h2 class="pa-subhead">Your adoption requests</h2>
+      {% if not requests %}
+        <div class="pa-empty-state">
+          <i class="fas fa-paw"></i>
+          <h3>You haven't requested a pet yet</h3>
+          <p>Open a pet's profile and choose “Request to adopt”. You'll be able to follow it here.</p>
+          <p class="mt-3 mb-0"><a class="btn pa-btn-primary" href="{{ url_for('public.home') }}#pets">Meet the pets</a></p>
+        </div>
+      {% else %}
+        <div class="pa-requests">
+        {% for r in requests %}
+          {% set label = {'Pending': 'Waiting for the shelter', 'Approved': 'Approved', 'Rejected': 'Not approved'}[r.status] %}
+          <article class="pa-request">
+            {{ upload_img('pets', r.pet_profile_image) }}
+            <div class="pa-request__main">
+              <h3>{{ r.pet_name or 'A pet that is no longer listed' }}</h3>
+              <p class="mb-1 text-muted">Sent {{ r.request_date|date }}</p>
+              {% if r.status == 'Approved' and r.adoption_status != 'Adopted' %}
+                <p class="mb-0">The shelter approved your request. They'll contact you to arrange the visit and paperwork.</p>
+              {% elif r.status == 'Approved' %}
+                <p class="mb-0">Adoption complete. Enjoy your time together!</p>
+              {% elif r.status == 'Pending' %}
+                <p class="mb-0">The shelter will review your request and contact you.</p>
+              {% endif %}
+              {% if r.remarks %}<p class="pa-request-note mb-0">Note from the shelter: {{ r.remarks }}</p>{% endif %}
+            </div>
+            <div class="pa-request__side">
+              <span class="pa-pill pa-pill--{{ r.status|status_class }}">{{ label }}</span>
+              {% if r.status == 'Pending' %}
+              <form method="post" action="{{ url_for('portal.cancel_request', request_id=r.adoption_request_id) }}" onsubmit="return confirm('Cancel your request?')">
+                {{ csrf_field() }}<button class="btn btn-link btn-sm p-0 mt-2">Cancel request</button>
+              </form>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+        </div>
+      {% endif %}
+
+    {% else %}
+      <h2 class="pa-subhead">Pets you brought to the shelter</h2>
+      {% if not pets %}
+        <div class="pa-empty-state"><i class="fas fa-paw"></i><h3>No pets are listed under your name</h3>
+          <p>If that's wrong, <a href="{{ url_for('public.contact') }}">let the shelter know</a>.</p></div>
+      {% else %}
+        <div class="pa-requests">
+        {% for p in pets %}
+          <article class="pa-request">
+            {{ upload_img('pets', p.pet_profile_image) }}
+            <div class="pa-request__main">
+              <h3>{{ p.pet_name }}</h3>
+              <p class="mb-1 text-muted">{{ p.pet_type_name or '' }}, registered {{ p.date_registered|date }}</p>
+              <p class="mb-0">
+                {% if p.adoption_status == 'Adopted' %}Adopted{% if p.adoption_date %} on {{ p.adoption_date|date }}{% endif %}. They've found a new home.
+                {% elif p.adoption_status == 'Pending' %}A family has been approved and the adoption is being arranged.
+                {% else %}Listed on the website and waiting for a family.{% endif %}
+              </p>
+            </div>
+            <div class="pa-request__side">
+              <span class="pa-pill pa-pill--{{ p.adoption_status|status_class }}">{{ {'Pending': 'On hold'}.get(p.adoption_status, p.adoption_status) }}</span>
+            </div>
+          </article>
+        {% endfor %}
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

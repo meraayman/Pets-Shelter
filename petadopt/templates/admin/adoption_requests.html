@@ -1,0 +1,78 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import pill, upload_img with context %}
+{% block title %}Adoption requests{% endblock %}
+{% block subheading %}<p class="pa-greeting">Requests sent by adopters from their account on the public site.</p>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <nav class="pa-filter" aria-label="Filter by status">
+      {% for s, label in [('Pending', 'Waiting'), ('Approved', 'Approved'), ('Rejected', 'Declined')] %}
+      <a href="{{ url_for('adoptions.requests_list', status=s) }}" {% if status == s %}aria-current="page"{% endif %}>{{ label }} {{ counts[s] }}</a>
+      {% endfor %}
+      <a href="{{ url_for('adoptions.requests_list', status='all') }}" {% if status == 'all' %}aria-current="page"{% endif %}>All {{ counts.values()|sum }}</a>
+    </nav>
+  </div>
+  <div class="card-body">
+    {% if not rows %}
+      <p class="pa-empty mb-0">
+        {% if status == 'Pending' %}No requests are waiting. When an adopter asks for a pet from their account, it shows up here.
+        {% else %}Nothing here yet.{% endif %}
+      </p>
+    {% else %}
+    <table class="table table-hover pa-datatable" data-order='[[0,"desc"]]'>
+      <thead><tr>
+        <th>Sent</th><th data-priority="1">Pet</th><th data-priority="1">Adopter</th><th>Their message</th><th>Status</th>
+        <th data-orderable="false" data-priority="1" style="min-width:240px">Decision</th>
+      </tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td data-order="{{ r.request_date }}{{ '%06d'|format(r.adoption_request_id) }}" class="text-nowrap">{{ r.request_date|date }}</td>
+          <td>
+            <div class="d-flex align-items-center" style="gap:10px">
+              {{ upload_img('pets', r.pet_profile_image, 'pa-avatar', '') }}
+              <div>
+                {% if r.pet_name %}<a href="{{ url_for('records.pet_edit', pet_id=r.pet_id) }}"><strong>{{ r.pet_name }}</strong></a><br>{{ pill(r.adoption_status) }}
+                {% else %}<span class="text-muted">Deleted pet</span>{% endif %}
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong>{{ r.adopter_name or 'Deleted adopter' }}</strong>
+            {% if r.adopter_email %}<br><a href="mailto:{{ r.adopter_email }}">{{ r.adopter_email }}</a>{% endif %}
+            {% if r.adopter_contact %}<br><span class="text-muted">{{ r.adopter_contact }}</span>{% endif %}
+          </td>
+          <td style="min-width:200px">{% if r.message %}<div class="pa-request-note">{{ r.message }}</div>{% else %}<span class="text-muted">No message</span>{% endif %}</td>
+          <td>
+            {{ pill({'Pending': 'Waiting', 'Rejected': 'Declined'}.get(r.status, r.status)) }}
+            {% if r.status != 'Pending' and r.staff_name %}<div class="small text-muted mt-1">by {{ r.staff_name }}, {{ r.approval_date|date }}</div>{% endif %}
+            {% if r.remarks %}<div class="small text-muted">{{ r.remarks }}</div>{% endif %}
+          </td>
+          <td>
+            {% if r.status == 'Pending' %}
+              <form method="post" class="pa-decision">
+                {{ csrf_field() }}
+                <label class="sr-only" for="note-{{ r.adoption_request_id }}">Note for this decision</label>
+                <input class="form-control form-control-sm mb-2" id="note-{{ r.adoption_request_id }}" name="remarks" maxlength="1000" placeholder="Note (optional)">
+                <button class="btn btn-primary btn-sm" formaction="{{ url_for('adoptions.request_action', request_id=r.adoption_request_id, action='approve') }}"><i class="fas fa-check"></i> Approve</button>
+                <button class="btn btn-danger btn-sm" formaction="{{ url_for('adoptions.request_action', request_id=r.adoption_request_id, action='reject') }}" data-confirm-click="Decline this request?"><i class="fas fa-times"></i> Decline</button>
+              </form>
+            {% elif r.status == 'Approved' and r.adoption_status != 'Adopted' %}
+              <a class="btn btn-primary btn-sm" href="{{ url_for('adoptions.adoption_new', request=r.adoption_request_id) }}"><i class="fas fa-home"></i> Record adoption</a>
+              <form method="post" class="d-inline" action="{{ url_for('adoptions.request_action', request_id=r.adoption_request_id, action='reject') }}" data-confirm="Cancel this approval? {{ r.pet_name }} will be available again if nobody else is approved.">
+                {{ csrf_field() }}<button class="btn btn-default btn-sm">Cancel approval</button>
+              </form>
+            {% elif r.status == 'Rejected' and r.adoption_status != 'Adopted' and r.pet_name %}
+              <form method="post" action="{{ url_for('adoptions.request_action', request_id=r.adoption_request_id, action='reopen') }}">
+                {{ csrf_field() }}<button class="btn btn-default btn-sm">Move back to waiting</button>
+              </form>
+            {% else %}<span class="text-muted small">No action needed</span>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

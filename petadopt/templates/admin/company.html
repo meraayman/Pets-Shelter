@@ -1,0 +1,44 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}Shelter info{% endblock %}
+{% block subheading %}<p class="pa-greeting">Shown on the public site, the sign-in page and the dashboard.</p>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {{ csrf_field() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card"><div class="card-body">
+        <div class="form-group">
+          <label for="company_name">Shelter name</label>
+          <input class="form-control" id="company_name" name="company_name" maxlength="150" required value="{{ company.company_name }}">
+        </div>
+        <div class="form-group">
+          <label for="company_address">Address</label>
+          <input class="form-control" id="company_address" name="company_address" maxlength="255" value="{{ company.company_address }}">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="company_contact">Phone</label>
+            <input class="form-control" id="company_contact" name="company_contact" maxlength="100" value="{{ company.company_contact }}">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="company_website">Website</label>
+            <input class="form-control" id="company_website" name="company_website" maxlength="255" placeholder="https://" value="{{ company.company_website }}">
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Logo</h3></div>
+        <div class="card-body">
+          <div class="pa-photo-preview pa-photo-preview--round mb-3" style="max-width:140px">{{ upload_img('logo', company.company_logo, '', '') }}</div>
+          <input type="file" class="form-control-file" name="company_logo" accept="image/jpeg,image/png,image/gif,image/webp" data-preview=".pa-photo-preview img">
+          <small class="form-text text-muted">A square image works best.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pa-form-actions"><button class="btn btn-primary">Save shelter info</button></div>
+</form>
+{% endblock %}

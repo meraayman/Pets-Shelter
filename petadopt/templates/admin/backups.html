@@ -1,0 +1,30 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import delete_button with context %}
+{% block title %}Backups{% endblock %}
+{% block subheading %}<p class="pa-greeting">Each backup is a .zip with the database and every uploaded photo and document.</p>{% endblock %}
+{% block actions %}
+<form method="post">{{ csrf_field() }}<button class="btn btn-primary"><i class="fas fa-download mr-1"></i> Create backup now</button></form>
+{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  {% if not files %}<p class="pa-empty mb-0">No backups yet. Create one before making big changes.</p>{% else %}
+  <table class="table table-hover mb-0">
+    <thead><tr><th>Backup</th><th>Created</th><th>Size</th><th class="text-right">Actions</th></tr></thead>
+    <tbody>
+    {% for f in files %}
+      <tr>
+        <td>{{ f.name }}</td>
+        <td>{{ f.created.strftime('%Y-%m-%d %H:%M:%S')|datetime }}</td>
+        <td>{{ (f.size / 1024)|round(1) }} KB</td>
+        <td class="text-right text-nowrap">
+          <a href="{{ url_for('admin.backup_download', name=f.name) }}" class="btn btn-success btn-sm"><i class="fas fa-download"></i> Download</a>
+          {{ delete_button(url_for('admin.backup_delete', name=f.name), f.name) }}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <p class="text-muted small mt-3 mb-0">To restore: stop the app, replace <code>instance/petadoption.db</code> and the <code>uploads</code> folder with the ones inside the .zip, then start the app again.</p>
+</div></div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img, delete_button, pill with context %}
+{% block title %}User accounts{% endblock %}
+{% block subheading %}<p class="pa-greeting">Staff who can sign in to this dashboard.</p>{% endblock %}
+{% block actions %}<a href="{{ url_for('accounts.user_form') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Add account</a>{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  <table class="table table-hover pa-datatable" data-order='[[1,"asc"]]'>
+    <thead><tr><th data-orderable="false">Photo</th><th data-priority="1">Name</th><th>Username</th><th>Role</th><th>Designation</th><th data-orderable="false" data-priority="1">Actions</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ upload_img('users', u.profile_image, 'pa-avatar', '') }}</td>
+        <td><strong>{{ u.complete_name }}</strong>{% if u.user_id == current_user.user_id %} <span class="text-muted">(you)</span>{% endif %}</td>
+        <td>{{ u.username }}</td>
+        <td><span class="pa-pill {{ 'pa-pill--ok' if u.user_type == 'admin' else 'pa-pill--done' }}">{{ 'Administrator' if u.user_type == 'admin' else 'Staff' }}</span></td>
+        <td>{{ u.designation }}</td>
+        <td class="text-nowrap">
+          <a href="{{ url_for('accounts.user_form', user_id=u.user_id) }}" class="btn btn-success btn-sm"><i class="fas fa-pen"></i> Edit</a>
+          {% if u.user_id != current_user.user_id %}{{ delete_button(url_for('accounts.user_delete', user_id=u.user_id), u.complete_name ~ "'s account") }}{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

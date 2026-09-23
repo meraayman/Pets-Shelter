@@ -1,0 +1,187 @@
+{% extends "base_public.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}Adopt a pet{% endblock %}
+{% block content %}
+<main>
+  <section class="pa-hero">
+    <div class="container">
+      {% include "_flashes.html" %}
+      <div class="row align-items-center">
+        <div class="col-lg-6 pa-hero__copy">
+          <h1>Meet the pets waiting for a home.</h1>
+          <p class="pa-lead">
+            {% if available_count %}
+              {{ available_count }} {{ 'pet is' if available_count == 1 else 'pets are' }} ready for adoption at {{ company.company_name }} right now.
+            {% else %}
+              Every pet in our care is currently matched with a family. New arrivals are listed here as soon as they're ready.
+            {% endif %}
+            Browse their profiles, then send us a message to arrange a visit.
+          </p>
+          <div class="pa-hero__actions">
+            <a href="#pets" class="btn pa-btn-primary btn-lg">Browse pets</a>
+            <a href="#how" class="btn pa-btn-ghost btn-lg">How adoption works</a>
+          </div>
+          {% if adopted_count %}
+          <p class="pa-hero__note"><i class="fas fa-home mr-2"></i>{{ adopted_count }} {{ 'pet has' if adopted_count == 1 else 'pets have' }} already gone home with a new family.</p>
+          {% endif %}
+        </div>
+        <div class="col-lg-6">
+          <div class="pa-collage pa-collage--{{ hero_pets|length }}" aria-hidden="true">
+            {% if not hero_pets %}<div class="pa-collage__empty"><i class="fas fa-paw"></i></div>{% endif %}
+            {% for p in hero_pets %}
+            <figure class="pa-collage__item pa-collage__item--{{ loop.index }}">
+              {{ upload_img('pets', p.pet_profile_image) }}
+              <figcaption>{{ p.pet_name }}</figcaption>
+            </figure>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pets" class="pa-section">
+    <div class="container">
+      <div class="pa-section__head">
+        <h2>Pets looking for a family</h2>
+        {% if pets %}
+        <div class="pa-tools">
+          <div class="pa-chips" role="group" aria-label="Filter by type">
+            <button type="button" class="pa-chip" data-filter="all" aria-pressed="true">All <span>{{ pets|length }}</span></button>
+            {% for t, n in types %}
+            <button type="button" class="pa-chip" data-filter="{{ t|lower }}" aria-pressed="false">{{ t }} <span>{{ n }}</span></button>
+            {% endfor %}
+          </div>
+          <label class="pa-search">
+            <i class="fas fa-search" aria-hidden="true"></i><span class="sr-only">Search by name</span>
+            <input type="search" id="petSearch" placeholder="Search by name" autocomplete="off">
+          </label>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if not pets %}
+        <div class="pa-empty-state">
+          <i class="fas fa-paw"></i>
+          <h3>No pets are listed right now</h3>
+          <p>New arrivals appear here once our team has checked their health. <a href="{{ url_for('public.contact') }}">Send us a message</a> and we'll let you know when someone new arrives.</p>
+        </div>
+      {% else %}
+        <div class="pa-grid" id="petGrid">
+          {% for p in pets %}{% set hold = p.adoption_status == 'Pending' %}
+          <article class="pa-pet" data-type="{{ p.pet_type_name|lower }}" data-name="{{ p.pet_name|lower }}">
+            <button type="button" class="pa-pet__open" data-toggle="modal" data-target="#pet-{{ p.pet_id }}">
+              <span class="pa-pet__photo">
+                {{ upload_img('pets', p.pet_profile_image, alt='Photo of ' ~ p.pet_name) }}
+                <span class="pa-tag{{ ' pa-tag--hold' if hold }}">{{ 'On hold' if hold else 'Adopt me' }}</span>
+              </span>
+              <span class="pa-pet__body">
+                <span class="pa-pet__name">{{ p.pet_name }}</span>
+                <span class="pa-pet__meta">{{ p.pet_type_name }}, {{ (p.age|age)[0]|lower ~ (p.age|age)[1:] }}{% if p.gender %}, {{ p.gender|lower }}{% endif %}</span>
+                <span class="pa-pet__facts">
+                  {% set vok = p.vaccination_status == 'Vaccinated' %}{% set hok = p.health_status == 'Healthy' %}
+                  <span class="{{ 'is-yes' if vok else 'is-no' }}"><i class="fas {{ 'fa-check' if vok else 'fa-minus' }}"></i> {{ p.vaccination_status }}</span>
+                  <span class="{{ 'is-yes' if hok else 'is-no' }}"><i class="fas {{ 'fa-check' if hok else 'fa-minus' }}"></i> {{ p.health_status }}</span>
+                </span>
+              </span>
+            </button>
+          </article>
+          {% endfor %}
+        </div>
+        <p class="pa-no-match" id="noMatch" hidden>No pets match that search. Try another name or choose “All”.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section id="how" class="pa-section pa-section--tint">
+    <div class="container">
+      <div class="pa-section__head"><h2>How adoption works</h2></div>
+      <ol class="pa-steps">
+        <li><h3>Find a pet you'd like to meet</h3><p>Open a profile to read about their personality, health and vaccinations.</p></li>
+        <li><h3>Send a request</h3><p>Create a free adopter account and request the pet, or just send us a question. We'll reply to set up a visit.</p></li>
+        <li><h3>Visit, then take them home</h3><p>Meet the pet in person. If it's a good match, we'll walk you through the adoption papers.</p></li>
+      </ol>
+      {% if not current_member %}<a href="{{ url_for('portal.register') }}" class="btn pa-btn-primary">Create an adopter account</a>{% endif %}
+      <a href="{{ url_for('public.contact') }}" class="btn pa-btn-ghost">Send a question</a>
+    </div>
+  </section>
+</main>
+
+{% for p in pets %}
+<div class="modal fade pa-pet-modal" id="pet-{{ p.pet_id }}" tabindex="-1" aria-labelledby="pet-{{ p.pet_id }}-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <button type="button" class="close pa-modal-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="row no-gutters">
+        <div class="col-md-6">{{ upload_img('pets', p.pet_profile_image, 'pa-pet-modal__img', 'Photo of ' ~ p.pet_name) }}</div>
+        <div class="col-md-6">
+          <div class="pa-pet-modal__body">
+            <h2 id="pet-{{ p.pet_id }}-title">{{ p.pet_name }}</h2>
+            <dl class="pa-facts">
+              <div><dt>Type</dt><dd>{{ p.pet_type_name }}</dd></div>
+              <div><dt>Age</dt><dd>{{ p.age|age }}</dd></div>
+              <div><dt>Sex</dt><dd>{{ p.gender or 'Unknown' }}</dd></div>
+              <div><dt>Health</dt><dd>{{ p.health_status }}</dd></div>
+              <div><dt>Vaccines</dt><dd>{{ p.vaccination_status }}</dd></div>
+            </dl>
+            {% if p.description %}<p class="pa-pet-modal__desc">{{ p.description }}</p>{% endif %}
+            {% if p.adoption_status == 'Pending' %}
+            <p class="pa-hold-note"><i class="fas fa-hourglass-half mr-2"></i>{{ p.pet_name }} is on hold for another family. You can still ask to be contacted if that changes.</p>
+            {% endif %}
+            {% if current_member and current_member.kind == 'adopter' %}
+              {% if p.pet_id in requested %}
+                <p class="pa-hold-note mb-2"><i class="fas fa-check mr-2"></i>You've already asked to adopt {{ p.pet_name }}. <a href="{{ url_for('portal.home') }}">See its status</a>.</p>
+              {% else %}
+                <form method="post" action="{{ url_for('portal.request_pet') }}" class="mb-2">
+                  {{ csrf_field() }}<input type="hidden" name="pet_id" value="{{ p.pet_id }}">
+                  <label for="msg-{{ p.pet_id }}" class="small">Tell the shelter about your home <span class="text-muted font-weight-normal">(optional)</span></label>
+                  <textarea class="form-control mb-2" id="msg-{{ p.pet_id }}" name="message" rows="3" maxlength="2000" placeholder="Other pets, children, yard, when you could visit"></textarea>
+                  <button class="btn pa-btn-primary btn-block">Request to adopt {{ p.pet_name }}</button>
+                </form>
+              {% endif %}
+              <a href="{{ url_for('public.contact', pet=p.pet_id) }}" class="btn btn-link btn-block">Ask a question instead</a>
+            {% elif current_member %}
+              <a href="{{ url_for('public.contact', pet=p.pet_id) }}" class="btn pa-btn-primary btn-block">Ask about {{ p.pet_name }}</a>
+            {% else %}
+              <a href="{{ url_for('portal.login', kind='adopter', next=url_for('public.home') ~ '#pets') }}" class="btn pa-btn-primary btn-block">Sign in to request {{ p.pet_name }}</a>
+              <p class="small text-muted text-center mt-2 mb-1">New here? <a href="{{ url_for('portal.register') }}">Create an adopter account</a></p>
+              <a href="{{ url_for('public.contact', pet=p.pet_id) }}" class="btn btn-link btn-block">Or ask a question without an account</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var grid = document.getElementById('petGrid');
+  if (!grid) return;
+  var cards = [].slice.call(grid.querySelectorAll('.pa-pet'));
+  var chips = [].slice.call(document.querySelectorAll('.pa-chip'));
+  var search = document.getElementById('petSearch');
+  var noMatch = document.getElementById('noMatch');
+  var active = 'all';
+  function apply() {
+    var q = search.value.trim().toLowerCase(), shown = 0;
+    cards.forEach(function (c) {
+      var ok = (active === 'all' || c.dataset.type === active) && (!q || c.dataset.name.indexOf(q) !== -1);
+      c.hidden = !ok; if (ok) shown++;
+    });
+    noMatch.hidden = shown !== 0;
+  }
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      active = chip.dataset.filter;
+      chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+      apply();
+    });
+  });
+  search.addEventListener('input', apply);
+})();
+</script>
+{% endblock %}

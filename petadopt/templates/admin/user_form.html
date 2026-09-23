@@ -1,0 +1,56 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}{{ 'Add account' if is_new else 'Edit ' ~ user.complete_name }}{% endblock %}
+{% block subheading %}<p class="pa-greeting"><a href="{{ url_for('accounts.users') }}"><i class="fas fa-arrow-left mr-1"></i> Back to user accounts</a></p>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {{ csrf_field() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card"><div class="card-body">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="complete_name">Full name</label>
+            <input class="form-control" id="complete_name" name="complete_name" maxlength="100" required value="{{ user.complete_name or '' }}">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="designation">Designation</label>
+            <input class="form-control" id="designation" name="designation" maxlength="255" placeholder="For example, Shelter volunteer" value="{{ user.designation or '' }}">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="username">Username</label>
+            <input class="form-control" id="username" name="username" maxlength="50" required autocomplete="off" value="{{ user.username or '' }}">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="password">{{ 'Password' if is_new else 'New password' }}</label>
+            <input class="form-control" type="password" id="password" name="password" minlength="8" autocomplete="new-password" {% if is_new %}required{% endif %}>
+            <small class="form-text text-muted">{{ 'At least 8 characters.' if is_new else 'Leave empty to keep the current password.' }}</small>
+          </div>
+        </div>
+        <div class="form-group mb-0">
+          <label for="user_type">Role</label>
+          <select class="form-control" id="user_type" name="user_type">
+            <option value="user" {% if user.user_type == 'user' %}selected{% endif %}>Staff: manage pets, owners, adopters and inquiries</option>
+            <option value="admin" {% if user.user_type == 'admin' %}selected{% endif %}>Administrator: also manage accounts, shelter info and backups</option>
+          </select>
+        </div>
+      </div></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Photo</h3></div>
+        <div class="card-body">
+          <div class="pa-photo-preview pa-photo-preview--round mb-3">{{ upload_img('users', user.profile_image, '', '') }}</div>
+          <input type="file" class="form-control-file" name="profile_image" accept="image/jpeg,image/png,image/gif,image/webp" data-preview=".pa-photo-preview img">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pa-form-actions">
+    <button class="btn btn-primary">{{ 'Create account' if is_new else 'Save changes' }}</button>
+    <a href="{{ url_for('accounts.users') }}" class="btn btn-default">Cancel</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import pill, upload_img with context %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}{{ greeting }}, {{ current_user.complete_name.split(' ')[0] }}{% endblock %}
+{% block subheading %}<p class="pa-greeting">Here's how the shelter is doing today, {{ today }}.</p>{% endblock %}
+{% block actions %}
+<a href="{{ url_for('adoptions.adoption_new') }}" class="btn btn-default mr-1"><i class="fas fa-home mr-1"></i> Record adoption</a>
+<a href="{{ url_for('records.pet_new') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Register a pet</a>
+{% endblock %}
+{% block content %}
+{% set tiles = [
+  ('records.pets', {}, 'ink', 'fa-paw', total, 'Pets registered'),
+  ('records.pets', {'status': 'Available'}, 'sage', 'fa-door-open', counts.Available, 'Ready for adoption'),
+  ('adoptions.requests_list', {}, 'brass', 'fa-clipboard-list', waiting_requests, 'Adoption requests waiting'),
+  ('admin.inquiries', {'status': 'New'}, 'alert', 'fa-inbox', new_inquiries, 'New inquiries'),
+] %}
+<div class="row">
+  {% for ep, args, tone, icon, num, label in tiles %}
+  <div class="col-6 col-xl-3 mb-3">
+    <div class="card h-100 mb-0">
+      <a class="pa-stat pa-tone-{{ tone }}" href="{{ url_for(ep, **args) }}">
+        <span class="pa-stat__icon"><i class="fas {{ icon }}"></i></span>
+        <span><span class="pa-stat__num d-block">{{ num }}</span><span class="pa-stat__label d-block">{{ label }}</span></span>
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="row">
+  <div class="col-lg-7 mb-3">
+    <div class="card h-100 mb-0">
+      <div class="card-header"><h3 class="card-title">Adoption progress</h3></div>
+      <div class="card-body">
+        {% if total == 0 %}
+          <p class="pa-empty mb-0">No pets registered yet. <a href="{{ url_for('records.pet_new') }}">Register the first pet</a> to start tracking adoptions.</p>
+        {% else %}
+          <p class="mb-3" style="font-size:1.05rem">
+            <strong>{{ counts.Adopted }}</strong> of {{ total }} pets have found a home.
+            {% if needs_care %}<a href="{{ url_for('admin.report', key='health') }}" class="text-muted">{{ needs_care }} still need treatment or vaccination.</a>{% endif %}
+          </p>
+          <div class="pa-progress" role="img" aria-label="{{ counts.Adopted }} adopted, {{ counts.Pending }} pending, {{ counts.Available }} available">
+            <span class="is-adopted" style="width:{{ (counts.Adopted / total * 100)|round(1) }}%"></span>
+            <span class="is-pending" style="width:{{ (counts.Pending / total * 100)|round(1) }}%"></span>
+            <span class="is-available" style="width:{{ (counts.Available / total * 100)|round(1) }}%"></span>
+          </div>
+          <div class="pa-legend">
+            <span><i style="background:#2e6b5a"></i>Adopted {{ counts.Adopted }}</span>
+            <span><i style="background:#e9a93a"></i>Pending {{ counts.Pending }}</span>
+            <span><i style="background:#9cc5b5"></i>Available {{ counts.Available }}</span>
+          </div>
+          {% if by_type %}
+          <hr class="my-4">
+          <h4 class="h6 font-weight-bold mb-3">Pets by type</h4>
+          <div style="height:{{ [120, by_type|length * 38]|max }}px"><canvas id="typeChart" aria-label="Number of pets per type"></canvas></div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5 mb-3">
+    <div class="card h-100 mb-0">
+      <div class="card-header d-flex align-items-center">
+        <h3 class="card-title">Recently registered</h3>
+        <a href="{{ url_for('records.pets') }}" class="ml-auto small font-weight-bold">All pets</a>
+      </div>
+      {% if not recent_pets %}<p class="pa-empty mb-0">New pets will appear here.</p>{% else %}
+      <ul class="pa-list">
+        {% for p in recent_pets %}
+        <li>
+          {{ upload_img('pets', p.pet_profile_image) }}
+          <div class="pa-list__main">
+            <a class="pa-list__title d-block text-reset" href="{{ url_for('records.pet_edit', pet_id=p.pet_id) }}">{{ p.pet_name }}</a>
+            <div class="pa-list__meta">{{ p.pet_type_name or 'Unknown type' }}, registered {{ p.date_registered|date }}</div>
+          </div>
+          {{ pill(p.adoption_status) }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+<div class="col-lg-5 mb-3">
+<div class="card h-100 mb-0">
+  <div class="card-header d-flex align-items-center">
+    <h3 class="card-title">Recent adoptions</h3>
+    <a href="{{ url_for('adoptions.adoptions_list') }}" class="ml-auto small font-weight-bold">All adoptions</a>
+  </div>
+  {% if not recent_adoptions %}
+    <p class="pa-empty mb-0">No adoptions recorded yet. <a href="{{ url_for('adoptions.adoption_new') }}">Record one</a> when a pet goes home.</p>
+  {% else %}
+  <ul class="pa-list">
+    {% for a in recent_adoptions %}
+    <li>
+      {{ upload_img('pets', a.pet_profile_image) }}
+      <div class="pa-list__main">
+        <div class="pa-list__title">{{ a.pet_name }}</div>
+        <div class="pa-list__meta">Adopted by {{ a.adopter_name or 'a deleted adopter' }}, {{ a.adoption_date|date }}</div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+</div>
+<div class="col-lg-7 mb-3">
+<div class="card h-100 mb-0">
+  <div class="card-header d-flex align-items-center">
+    <h3 class="card-title">Latest activity</h3>
+    <a href="{{ url_for('admin.activity') }}" class="ml-auto small font-weight-bold">Full log</a>
+  </div>
+  {% if not activity %}<p class="pa-empty mb-0">Changes made by staff will be listed here.</p>{% else %}
+  <ul class="pa-list">
+    {% for a in activity %}
+    <li><div class="pa-list__main">
+      <div class="pa-list__title">{{ a.details }}</div>
+      <div class="pa-list__meta">{{ a.complete_name or 'Unknown user' }}, {{ a.date_time|datetime }}</div>
+    </div></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if by_type and total %}
+<script src="{{ url_for('static', filename='vendor/chartjs/Chart.min.js') }}"></script>
+<script>
+  var types = {{ by_type|tojson }};
+  new Chart(document.getElementById('typeChart'), {
+    type: 'horizontalBar',
+    data: {
+      labels: types.map(function (t) { return t.pet_type_name; }),
+      datasets: [{ data: types.map(function (t) { return t.n; }), backgroundColor: '#2e6b5a', hoverBackgroundColor: '#22523f', barThickness: 18 }]
+    },
+    options: {
+      maintainAspectRatio: false, legend: { display: false }, tooltips: { displayColors: false },
+      scales: {
+        xAxes: [{ ticks: { beginAtZero: true, precision: 0, fontColor: '#7b8a8d' }, gridLines: { color: '#eef2ef', zeroLineColor: '#dde5df' } }],
+        yAxes: [{ ticks: { fontColor: '#1e2b2f', fontStyle: '600' }, gridLines: { display: false } }]
+      }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

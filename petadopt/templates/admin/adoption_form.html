@@ -1,0 +1,62 @@
+{% extends "base_admin.html" %}
+{% block title %}Record an adoption{% endblock %}
+{% block subheading %}<p class="pa-greeting"><a href="{{ url_for('adoptions.adoptions_list') }}"><i class="fas fa-arrow-left mr-1"></i> Back to adoptions</a></p>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {{ csrf_field() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card"><div class="card-body">
+        {% if not pets %}
+          <p class="pa-empty mb-0">Every pet is already adopted. <a href="{{ url_for('records.pet_new') }}">Register a pet</a> first.</p>
+        {% else %}
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="pet_id">Pet</label>
+            <select class="form-control" id="pet_id" name="pet_id" required>
+              <option value="" disabled {% if not data.pet_id %}selected{% endif %}>Choose a pet</option>
+              {% for p in pets %}<option value="{{ p.pet_id }}" {% if p.pet_id == data.pet_id %}selected{% endif %}>{{ p.pet_name }} ({{ p.pet_type_name or 'Unknown type' }}{{ ', on hold' if p.adoption_status == 'Pending' }})</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="adopter_id">Adopter</label>
+            <select class="form-control" id="adopter_id" name="adopter_id" required>
+              <option value="" disabled {% if not data.adopter_id %}selected{% endif %}>Choose an adopter</option>
+              {% for a in adopters %}<option value="{{ a.adopter_id }}" {% if a.adopter_id == data.adopter_id %}selected{% endif %}>{{ a.adopter_name }}{{ ' (' ~ a.adopter_email ~ ')' if a.adopter_email }}</option>{% endfor %}
+            </select>
+            <small class="form-text"><a href="{{ url_for('records.person_form', kind='adopters') }}">Add a new adopter</a></small>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="adoption_date">Date they took the pet home</label>
+          <input class="form-control" type="date" id="adoption_date" name="adoption_date" required value="{{ data.adoption_date }}" style="max-width:220px">
+        </div>
+        <div class="form-group mb-0">
+          <label for="remarks">Notes <span class="text-muted font-weight-normal">(optional)</span></label>
+          <textarea class="form-control" id="remarks" name="remarks" rows="3" maxlength="2000" placeholder="For example, adoption fee paid, follow-up visit planned">{{ data.remarks or '' }}</textarea>
+        </div>
+        {% endif %}
+      </div></div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Adoption papers</h3></div>
+        <div class="card-body">
+          <input type="file" class="form-control-file" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+          <small class="form-text text-muted">Optional. A signed form or contract as PDF, Word, JPG or PNG. Only staff can open it.</small>
+        </div>
+      </div>
+      <div class="card"><div class="card-body small text-muted">
+        Saving marks the pet as adopted. If other people asked for this pet, their requests are declined automatically
+        and they'll see that in their account.
+      </div></div>
+    </div>
+  </div>
+  {% if pets %}
+  <div class="pa-form-actions">
+    <button class="btn btn-primary">Record adoption</button>
+    <a href="{{ url_for('adoptions.adoptions_list') }}" class="btn btn-default">Cancel</a>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

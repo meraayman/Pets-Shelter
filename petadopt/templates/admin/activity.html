@@ -1,0 +1,21 @@
+{% extends "base_admin.html" %}
+{% block title %}Activity log{% endblock %}
+{% block subheading %}<p class="pa-greeting">Every change made by staff, newest first.</p>{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  {% if not rows %}<p class="pa-empty mb-0">Nothing has been changed yet.</p>{% else %}
+  <table class="table table-hover pa-datatable" data-order='[[0,"desc"]]'>
+    <thead><tr><th>When</th><th>Who</th><th>What changed</th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td class="text-nowrap" data-order="{{ r.date_time }}">{{ r.date_time|datetime }}</td>
+        <td>{{ r.complete_name or 'Deleted user' }}</td>
+        <td>{{ r.details }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div></div>
+{% endblock %}

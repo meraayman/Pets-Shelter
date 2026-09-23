@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Staff sign in | {{ company.company_name }}</title>
+  {% include "_head.html" %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/petcare-admin.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/petcare-site.css') }}">
+</head>
+<body class="pa-auth">
+<main class="pa-auth__wrap">
+  <section class="pa-auth__side">
+    <a href="{{ url_for('public.home') }}" class="pa-auth__brand"><span class="pa-tag-dot"><i class="fas fa-paw"></i></span>{{ company.company_name }}</a>
+    <p class="pa-auth__quote">Every record you keep here helps a pet get home faster.</p>
+  </section>
+  <section class="pa-auth__form">
+    <div class="pa-auth__card">
+      <h1>Staff sign in</h1>
+      <p class="pa-muted">Use the account your administrator gave you.</p>
+      {% include "_flashes.html" %}
+      <form method="post">
+        {{ csrf_field() }}
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="{{ username }}" autocomplete="username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="pa-password">
+            <input type="password" class="form-control" id="password" name="password" autocomplete="current-password" required>
+            <button type="button" class="pa-password__toggle" aria-label="Show password" aria-pressed="false"><i class="far fa-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">Sign in</button>
+      </form>
+      <a href="{{ url_for('public.home') }}" class="pa-auth__back"><i class="fas fa-arrow-left mr-1"></i> Back to the public site</a>
+    </div>
+  </section>
+</main>
+<script>
+document.querySelector('.pa-password__toggle').addEventListener('click', function () {
+  var input = document.getElementById('password'), show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  this.setAttribute('aria-pressed', show);
+  this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  this.innerHTML = show ? '<i class="far fa-eye-slash"></i>' : '<i class="far fa-eye"></i>';
+});
+</script>
+</body>
+</html>

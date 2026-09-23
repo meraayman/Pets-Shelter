@@ -1,0 +1,61 @@
+{% extends "base_public.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}Contact us{% endblock %}
+{% block content %}
+<main class="pa-section pa-contact">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-7 mb-5">
+        <h1 class="pa-page-title">Send us a message</h1>
+        <p class="pa-lead mb-4">Ask about a pet, arrange a visit, or tell us you'd like to foster. A staff member will reply by email.</p>
+        {% include "_flashes.html" %}
+        {% if pet %}
+        <div class="pa-about-pet">
+          {{ upload_img('pets', pet.pet_profile_image) }}
+          <div>
+            <strong>You're asking about {{ pet.pet_name }}</strong>
+            <span>{{ 'Currently on hold for another family' if pet.adoption_status == 'Pending' else 'Available for adoption' }}</span>
+          </div>
+        </div>
+        {% endif %}
+        <form method="post" class="pa-form" action="{{ url_for('public.contact', pet=pet.pet_id if pet else None) }}">
+          {{ csrf_field() }}
+          <div class="pa-hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="name">Your name</label>
+              <input type="text" id="name" name="name" class="form-control" maxlength="100" required value="{{ form.name }}" autocomplete="name">
+            </div>
+            <div class="form-group col-md-6">
+              <label for="phone">Phone <span class="pa-optional">(optional)</span></label>
+              <input type="tel" id="phone" name="phone" class="form-control" maxlength="30" value="{{ form.phone }}" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" maxlength="150" required value="{{ form.email }}" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" class="form-control" maxlength="200" required value="{{ form.subject }}">
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" class="form-control" rows="6" maxlength="3000" required placeholder="Tell us about your home, other pets, and when you could visit.">{{ form.message }}</textarea>
+          </div>
+          <button type="submit" class="btn pa-btn-primary btn-lg">Send message</button>
+        </form>
+      </div>
+      <div class="col-lg-4 offset-lg-1">
+        <aside class="pa-visit">
+          <h2>Visit the shelter</h2>
+          {% if company.company_address %}<p><i class="fas fa-map-marker-alt"></i><span>{{ company.company_address }}</span></p>{% endif %}
+          {% if company.company_contact %}<p><i class="fas fa-phone"></i><span>{{ company.company_contact }}</span></p>{% endif %}
+          {% if company.company_website %}<p><i class="fas fa-globe"></i><a href="{{ company.company_website }}" target="_blank" rel="noopener">{{ company.company_website|replace('https://','')|replace('http://','')|trim('/') }}</a></p>{% endif %}
+          <p class="pa-visit__note">Please message us before visiting so a staff member can introduce you to the pet.</p>
+        </aside>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

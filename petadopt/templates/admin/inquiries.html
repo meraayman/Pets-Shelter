@@ -1,0 +1,43 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import pill, delete_button, filter_nav with context %}
+{% block title %}Inquiries{% endblock %}
+{% block subheading %}<p class="pa-greeting">Messages sent from the public contact page.</p>{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-header">{{ filter_nav('admin.inquiries', status, counts) }}</div>
+  <div class="card-body">
+    {% if not rows %}
+      <p class="pa-empty mb-0">{{ 'No ' ~ status|lower ~ ' inquiries.' if status else 'No messages yet. They will appear here when visitors use the contact page.' }}</p>
+    {% else %}
+    <table class="table table-hover pa-datatable" data-order='[[0,"desc"]]'>
+      <thead><tr><th>Received</th><th>From</th><th>About</th><th>Message</th><th>Status</th><th data-orderable="false" data-priority="1">Actions</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td class="text-nowrap" data-order="{{ r.created_at }}">{{ r.created_at|datetime }}</td>
+          <td>
+            <strong>{{ r.name }}</strong><br>
+            <a href="mailto:{{ r.email }}">{{ r.email }}</a>
+            {% if r.phone %}<br><span class="text-muted">{{ r.phone }}</span>{% endif %}
+          </td>
+          <td>{% if r.pet_name %}<a href="{{ url_for('records.pet_edit', pet_id=r.pet_id) }}">{{ r.pet_name }}</a>{% else %}<span class="text-muted">General</span>{% endif %}</td>
+          <td style="min-width:260px"><strong>{{ r.subject }}</strong><div class="text-muted" style="white-space:pre-line">{{ r.message }}</div></td>
+          <td>{{ pill(r.status) }}</td>
+          <td class="text-nowrap">
+            <a class="btn btn-success btn-sm" href="mailto:{{ r.email }}?subject={{ ('Re: ' ~ r.subject)|urlencode }}"><i class="fas fa-reply"></i> Reply</a>
+            <form action="{{ url_for('admin.inquiry_status', inquiry_id=r.inquiry_id) }}" method="post" class="d-inline">
+              {{ csrf_field() }}
+              {% if r.status == 'New' %}<button class="btn btn-default btn-sm" name="status" value="Replied">Mark replied</button>{% endif %}
+              {% if r.status != 'Closed' %}<button class="btn btn-default btn-sm" name="status" value="Closed">Close</button>
+              {% else %}<button class="btn btn-default btn-sm" name="status" value="New">Reopen</button>{% endif %}
+            </form>
+            {{ delete_button(url_for('admin.inquiry_delete', inquiry_id=r.inquiry_id), 'this message', '') }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import select, upload_img with context %}
+{% block title %}{{ 'Add a pet' if is_new else 'Edit ' ~ pet.pet_name }}{% endblock %}
+{% block subheading %}<p class="pa-greeting"><a href="{{ url_for('records.pets') }}"><i class="fas fa-arrow-left mr-1"></i> Back to pets</a></p>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {{ csrf_field() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">About the pet</h3></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="pet_name">Name</label>
+              <input class="form-control" id="pet_name" name="pet_name" maxlength="100" required value="{{ pet.pet_name or '' }}">
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="pet_type_id">Type</label>
+                <select class="form-control" id="pet_type_id" name="pet_type_id" required>
+                  <option value="" disabled {% if not pet.pet_type_id %}selected{% endif %}>Choose a type</option>
+                  {% for t in types %}<option value="{{ t.pet_type_id }}" {% if t.pet_type_id == pet.pet_type_id %}selected{% endif %}>{{ t.pet_type_name }}</option>{% endfor %}
+                </select>
+                {% if not types %}<small class="form-text"><a href="{{ url_for('records.pet_types') }}">Add a pet type first</a></small>{% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="age">Age in years</label>
+              <input class="form-control" type="number" id="age" name="age" min="0" max="60" required value="{{ pet.age if pet.age is not none else '' }}">
+              <small class="form-text text-muted">Use 0 for pets under a year old.</small>
+            </div>
+            <div class="col-md-4">{{ select('gender', 'Sex', genders, pet.gender, 'Choose') }}</div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="pet_owner_id">Brought in by <span class="text-muted font-weight-normal">(optional)</span></label>
+                <select class="form-control" id="pet_owner_id" name="pet_owner_id">
+                  <option value="">No owner on record</option>
+                  {% for o in owners %}<option value="{{ o.pet_owner_id }}" {% if o.pet_owner_id == pet.pet_owner_id %}selected{% endif %}>{{ o.pet_owner_name }}</option>{% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4" maxlength="3000" placeholder="Personality, habits, what kind of home would suit them">{{ pet.description or '' }}</textarea>
+            <small class="form-text text-muted">Shown to visitors on the public site.</small>
+          </div>
+          <div class="form-row">
+            <div class="col-md-4">{{ select('health_status', 'Health', health_statuses, pet.health_status) }}</div>
+            <div class="col-md-4">{{ select('vaccination_status', 'Vaccines', vaccine_statuses, pet.vaccination_status) }}</div>
+            <div class="col-md-4">{{ select('adoption_status', 'Adoption status', pet_statuses, pet.adoption_status) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Photo</h3></div>
+        <div class="card-body">
+          <div class="pa-photo-preview mb-3">{{ upload_img('pets', pet.pet_profile_image, '', '') }}</div>
+          <label for="pet_profile_image" class="sr-only">Photo</label>
+          <input type="file" class="form-control-file" id="pet_profile_image" name="pet_profile_image" accept="image/jpeg,image/png,image/gif,image/webp" data-preview=".pa-photo-preview img" {% if is_new %}required{% endif %}>
+          <small class="form-text text-muted">JPG, PNG, GIF or WebP, up to 8 MB.{% if not is_new %} Leave empty to keep the current photo.{% endif %}</small>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Records</h3></div>
+        <div class="card-body">
+          {% for field, folder, label in [('upload_health_history', 'health', 'Health history'), ('proof_of_vaccination', 'vaccination', 'Proof of vaccination')] %}
+          <div class="form-group">
+            <label for="{{ field }}">{{ label }}</label>
+            {% if pet[field] %}
+            <div class="pa-file mb-2">
+              <a href="{{ url_for('uploaded_file', folder=folder, filename=pet[field]) }}" target="_blank"><i class="fas fa-file-alt mr-1"></i> View current file</a>
+              <label class="ml-auto mb-0 font-weight-normal small"><input type="checkbox" name="remove_{{ field }}" value="1"> Remove</label>
+            </div>
+            {% endif %}
+            <input type="file" class="form-control-file" id="{{ field }}" name="{{ field }}" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+          </div>
+          {% endfor %}
+          <small class="form-text text-muted">PDF, Word, JPG or PNG. Only signed-in staff can open these files.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pa-form-actions">
+    <button type="submit" class="btn btn-primary">{{ 'Add pet' if is_new else 'Save changes' }}</button>
+    <a href="{{ url_for('records.pets') }}" class="btn btn-default">Cancel</a>
+  </div>
+</form>
+{% endblock %}

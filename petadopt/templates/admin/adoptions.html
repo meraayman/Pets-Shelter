@@ -1,0 +1,42 @@
+{% extends "base_admin.html" %}
+{% from "_macros.html" import upload_img with context %}
+{% block title %}Adoptions{% endblock %}
+{% block subheading %}<p class="pa-greeting">Pets that have gone home, and who took them.</p>{% endblock %}
+{% block actions %}<a href="{{ url_for('adoptions.adoption_new') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Record adoption</a>{% endblock %}
+{% block content %}
+<div class="card"><div class="card-body">
+  {% if not rows %}
+    <p class="pa-empty mb-0">No adoptions recorded yet. When a pet goes home, <a href="{{ url_for('adoptions.adoption_new') }}">record the adoption</a> so it's marked as adopted everywhere.</p>
+  {% else %}
+  <table class="table table-hover pa-datatable" data-order='[[0,"desc"]]'>
+    <thead><tr><th>Date</th><th data-priority="1">Pet</th><th data-priority="1">Adopter</th><th>Recorded by</th><th>Papers</th><th>Notes</th><th data-orderable="false" data-priority="2">Actions</th></tr></thead>
+    <tbody>
+    {% for a in rows %}
+      <tr>
+        <td data-order="{{ a.adoption_date }}" class="text-nowrap">{{ a.adoption_date|date }}</td>
+        <td>
+          <div class="d-flex align-items-center" style="gap:10px">
+            {{ upload_img('pets', a.pet_profile_image, 'pa-avatar', '') }}
+            <div><strong>{{ a.pet_name or 'Deleted pet' }}</strong><br><span class="text-muted small">{{ a.pet_type_name or '' }}</span></div>
+          </div>
+        </td>
+        <td>
+          <strong>{{ a.adopter_name or 'Deleted adopter' }}</strong>
+          {% if a.adopter_contact %}<br><span class="text-muted">{{ a.adopter_contact }}</span>{% endif %}
+          {% if a.adopter_email %}<br><a href="mailto:{{ a.adopter_email }}">{{ a.adopter_email }}</a>{% endif %}
+        </td>
+        <td>{{ a.staff_name or '—' }}</td>
+        <td>{% if a.upload_adoption_document %}<a href="{{ url_for('uploaded_file', folder='adoptions', filename=a.upload_adoption_document) }}" target="_blank"><i class="fas fa-file-alt mr-1"></i>View</a>{% else %}<span class="text-muted">None</span>{% endif %}</td>
+        <td>{{ a.remarks or '' }}</td>
+        <td>
+          <form method="post" action="{{ url_for('adoptions.adoption_undo', adoption_id=a.adoption_id) }}" data-confirm="Remove this adoption record? {{ a.pet_name }} will be listed as available again.">
+            {{ csrf_field() }}<button class="btn btn-danger btn-sm"><i class="fas fa-undo"></i> Undo</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div></div>
+{% endblock %}

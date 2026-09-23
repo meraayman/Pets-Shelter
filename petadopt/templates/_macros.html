@@ -1,0 +1,37 @@
+{% macro pill(status) -%}
+<span class="pa-pill pa-pill--{{ status|status_class }}">{{ status }}</span>
+{%- endmacro %}
+
+{% macro upload_img(folder, name, cls="", alt="") -%}
+{% if name %}<img src="{{ url_for('uploaded_file', folder=folder, filename=name) }}" class="{{ cls }}" alt="{{ alt }}" loading="lazy" onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/placeholder.svg') }}'">
+{% else %}<img src="{{ url_for('static', filename='img/placeholder.svg') }}" class="{{ cls }}" alt="{{ alt }}">{% endif %}
+{%- endmacro %}
+
+{% macro delete_button(action, what, label="Delete") -%}
+<form action="{{ action }}" method="post" class="d-inline" data-confirm="Delete {{ what }}? This can't be undone.">
+  {{ csrf_field() }}
+  <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> {{ label }}</button>
+</form>
+{%- endmacro %}
+
+{% macro select(name, label, options, value, placeholder=None, required=True) -%}
+<div class="form-group">
+  <label for="{{ name }}">{{ label }}</label>
+  <select class="form-control" id="{{ name }}" name="{{ name }}" {% if required %}required{% endif %}>
+    {% if placeholder %}<option value="" {% if not value %}selected{% endif %} disabled>{{ placeholder }}</option>{% endif %}
+    {% for opt in options %}
+      {% if opt is string %}{% set v, t = opt, opt %}{% else %}{% set v, t = opt[0], opt[1] %}{% endif %}
+      <option value="{{ v }}" {% if v|string == value|string %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+</div>
+{%- endmacro %}
+
+{% macro filter_nav(endpoint, current, counts, labels=None) -%}
+<nav class="pa-filter" aria-label="Filter by status">
+  <a href="{{ url_for(endpoint) }}" {% if not current %}aria-current="page"{% endif %}>All {{ counts.values()|sum }}</a>
+  {% for s, n in counts.items() %}
+  <a href="{{ url_for(endpoint, status=s) }}" {% if current == s %}aria-current="page"{% endif %}>{{ s }} {{ n }}</a>
+  {% endfor %}
+</nav>
+{%- endmacro %}
