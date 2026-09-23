@@ -119,35 +119,27 @@ Every report can be **printed** or downloaded as a **CSV** that opens in Excel.
 
 ---
 
-## Quick start
+##  Try it yourself
 
-> **You need:** [Python 3.9 or newer](https://www.python.org/downloads/). On Windows, tick **"Add python.exe to PATH"** during installation.
+1. **Download** this project: click the green **Code** button above, then **Download ZIP**, and unzip it.
+2. **Install Python** from [python.org](https://www.python.org/downloads/). On Windows, tick **"Add python.exe to PATH"** during setup.
+3. **Start the app**: double-click **`run_windows.bat`** (on macOS or Linux, run `./run_mac_linux.sh`).
 
-**1. Download the project**
-```bash
-git clone https://github.com/YOUR-USERNAME/pet_adoption_python_v2.git
-cd pet_adoption_python_v2
-```
-Or click **Code → Download ZIP** above and unzip it.
+The website opens in your browser automatically. The first start takes about a minute while it sets itself up.
 
-**2. Start it**
+###  Explore the admin dashboard
 
-| Windows | macOS / Linux |
-|---|---|
-| Double-click **`run_windows.bat`** | Run **`./run_mac_linux.sh`** |
+Click **Sign in → Shelter staff** at the top of the site and use:
 
-The first start installs everything it needs (about a minute, internet required once). Then your browser opens the site by itself.
+<div align="center">
 
-**3. Sign in**
+| Username | Password |
+|:---:|:---:|
+| `admin` | `12345678` |
 
-While the app is running on your computer, these addresses work in your browser:
+</div>
 
-| Who | Address |
-|---|---|
-| Visitors and adopters | `127.0.0.1:5000` |
-| Shelter staff | `127.0.0.1:5000/login` |
-
->  **Demo staff account:** username `admin`, password `admin123`
+---
 
 To stop the app, close its window or press `Ctrl + C`.
 
