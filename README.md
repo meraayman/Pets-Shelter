@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🐾 Pet Adoption System
+# Pet Adoption System
 
 **A complete web app for animal shelters: list pets, take adoption requests, and follow every pet from arrival to its new home.**
 
@@ -23,19 +23,19 @@
 
 ---
 
-## ✨ Why it stands out
+## Why it stands out
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### ⚡ Runs in one click
+### Runs in one click
 No database server, no web server to configure. The whole database is a single file, so the app starts with one double-click on Windows, macOS or Linux.
 
 </td>
 <td width="50%" valign="top">
 
-### 🏡 Built around adoption
+### Built around adoption
 From a visitor's first click to the signed papers, every step has a screen: requests, approvals, holds, and a full adoption history.
 
 </td>
@@ -43,13 +43,13 @@ From a visitor's first click to the signed papers, every step has a screen: requ
 <tr>
 <td width="50%" valign="top">
 
-### 🔒 Secure by default
+### Secure by default
 Role-based access, protected forms, verified uploads, private documents and sign-in lockout after repeated wrong passwords.
 
 </td>
 <td width="50%" valign="top">
 
-### 📱 Modern and responsive
+### Modern and responsive
 A clean, friendly design that works on phones, tablets and desktops, for visitors and staff alike.
 
 </td>
@@ -58,41 +58,41 @@ A clean, friendly design that works on phones, tablets and desktops, for visitor
 
 ---
 
-## 🧩 Features
+## Features
 
-### 🌐 Public website
+### Public website
 - **Live pet gallery** showing every pet ready for adoption, with photos, age, health and vaccination status
 - **Filter by type and search by name** instantly, without reloading the page
 - **Pet profiles** with the full description and a one-click adoption request
 - **Contact form** with spam protection; every message lands in the staff inbox
 - **"How adoption works"** guide so visitors know what to expect
 
-### 👤 Adopter and pet owner accounts
+### Adopter and pet owner accounts
 - **Adopters sign up themselves**, request pets, and follow each request live: *waiting*, *approved* or *not approved*
 - Read **notes from the shelter**, cancel a request, and update contact details and password
 - See every pet they've **adopted**, with the date it went home
 - **Pet owners** see the pets they brought in and whether each one has found a family
 
-### 🗂️ Staff dashboard
+### Staff dashboard
 - **At-a-glance overview**: pets registered, ready for adoption, requests waiting, new inquiries
 - **Adoption progress bar** and a **pets-by-type chart**
 - Recently registered pets, recent adoptions and the latest staff activity
 - **Menu badges** that show how many requests and messages need attention
 
-### 🐶 Records management
+### Records management
 - **Pets**: photo, type, age, sex, description, health and vaccination status, health history and vaccination proof
 - **Pet owners**, **adopters** and **pet types**, with safeguards that prevent deleting anything still in use
 - Sortable, searchable tables with status filters
 - Photo previews before uploading
 
-### 🏠 Adoption workflow
+### Adoption workflow
 - **Approve or decline** requests with a note the adopter can read
 - Approving automatically puts the pet **on hold**
 - **Record an adoption** from a request or for walk-in adopters, and attach the signed papers
 - Other people who asked for the same pet are **notified automatically**
 - **Undo** a mistaken adoption in one click
 
-### 📊 Reports
+### Reports
 | Report | What it shows |
 |---|---|
 | **Adoption status** | Every pet and whether it's available, on hold or adopted |
@@ -103,14 +103,14 @@ A clean, friendly design that works on phones, tablets and desktops, for visitor
 
 Every report can be **printed** or downloaded as a **CSV** that opens in Excel.
 
-### ⚙️ Administration
+### Administration
 - **Staff accounts** with two roles: *Staff* and *Administrator*
 - **Shelter info** (name, logo, address, phone, website) that updates across the whole site instantly
 - **One-click backups**: a `.zip` with the database *and* every photo and document
 - **Activity log** recording who changed what, and when
 - **Inbox** for contact-form messages, with replied/closed tracking
 
-### 🛡️ Security
+### Security
 - Every page and action checks who is signed in and what their role allows
 - Protection against cross-site request forgery on every form
 - Uploads are checked by their **actual content**, not just the file name
@@ -119,7 +119,7 @@ Every report can be **printed** or downloaded as a **CSV** that opens in Excel.
 
 ---
 
-## 🚀 Quick start
+## Quick start
 
 > **You need:** [Python 3.9 or newer](https://www.python.org/downloads/). On Windows, tick **"Add python.exe to PATH"** during installation.
 
@@ -145,7 +145,7 @@ The first start installs everything it needs (about a minute, internet required 
 | Visitors and adopters | **http://127.0.0.1:5000** |
 | Shelter staff | **http://127.0.0.1:5000/login** |
 
-> 🔑 **Demo staff account:** username `admin`, password `YOUR_DEMO_PASSWORD`
+>  **Demo staff account:** username `admin`, password `YOUR_DEMO_PASSWORD`
 
 To stop the app, close its window or press `Ctrl + C`.
 
@@ -172,7 +172,7 @@ python app.py
 
 ---
 
-## 👥 Who can do what
+## Who can do what
 
 | | Visitor | Adopter | Pet owner | Staff | Administrator |
 |---|:---:|:---:|:---:|:---:|:---:|
@@ -186,7 +186,7 @@ python app.py
 
 ---
 
-## 🔄 How an adoption works
+## How an adoption works
 
 ```mermaid
 flowchart LR
@@ -197,7 +197,7 @@ flowchart LR
     D -- Decline --> F[Adopter sees the reason]
     E --> G[Visit and paperwork]
     G --> H[Staff record the adoption]
-    H --> I([Pet marked as adopted 🎉])
+    H --> I([Pet marked as adopted ])
     H -. automatically .-> J[Other requests for this pet are closed]
 ```
 
@@ -205,7 +205,7 @@ Staff can also record adoptions directly for walk-in adopters, without a request
 
 ---
 
-## 🛠️ Built with
+## Built with
 
 | Layer | Technology |
 |---|---|
@@ -217,7 +217,7 @@ Staff can also record adoptions directly for walk-in adopters, without a request
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 pet_adoption_python_v2/
@@ -242,7 +242,7 @@ pet_adoption_python_v2/
 
 ---
 
-## 🌍 Using it on a network
+## Using it on a network
 
 Run `python app.py --lan`, then open `http://<this computer's IP address>:5000` from any device on the same network. That's ideal for a shelter's front desk and staff laptops.
 
