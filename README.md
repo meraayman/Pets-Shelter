@@ -136,16 +136,18 @@ Or click **Code → Download ZIP** above and unzip it.
 |---|---|
 | Double-click **`run_windows.bat`** | Run **`./run_mac_linux.sh`** |
 
-The first start installs everything it needs (about a minute, internet required once). Your browser then opens at **http://127.0.0.1:5000**.
+The first start installs everything it needs (about a minute, internet required once). Then your browser opens the site by itself.
 
 **3. Sign in**
 
-| Who | Where |
-|---|---|
-| Visitors and adopters | **http://127.0.0.1:5000** |
-| Shelter staff | **http://127.0.0.1:5000/login** |
+While the app is running on your computer, these addresses work in your browser:
 
->  **Demo staff account:** username `admin`, password `YOUR_DEMO_PASSWORD`
+| Who | Address |
+|---|---|
+| Visitors and adopters | `127.0.0.1:5000` |
+| Shelter staff | `127.0.0.1:5000/login` |
+
+>  **Demo staff account:** username `admin`, password `admin123`
 
 To stop the app, close its window or press `Ctrl + C`.
 
